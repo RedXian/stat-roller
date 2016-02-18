@@ -1,4 +1,6 @@
-angular.module("characterSheet.roller", [])
+'use strict';
+
+angular.module('roller', [])
     .factory("RollerFactory", function() {
         var roller = {
             getResult: function(notation) {

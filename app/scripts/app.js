@@ -15,7 +15,7 @@ angular
     'ngResource',
     'ngRoute',
     'ngSanitize',
-    'ngTouch'
+    'ngTouch','roller'
   ])
   .config(function ($routeProvider) {
     $routeProvider
@@ -31,8 +31,8 @@ angular
       })
       .when('/roller', {
         templateUrl: 'views/roller.html',
-        controller: 'RollerCtrl',
-        controllerAs: 'roller'
+        controller: 'AbilityCtrl',
+        controllerAs: 'ability'
       })
       .otherwise({
         redirectTo: '/'
