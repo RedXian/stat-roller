@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('roller', [])
-    .factory("RollerFactory", function() {
+    .factory('RollerFactory', function() {
         var roller = {
             getResult: function(notation) {
                 var result = [];
@@ -19,22 +19,22 @@ angular.module('roller', [])
                             sum += roll;
                         }
                     }
-                };
+                }
                 result.push({
-                    name: "Total",
+                    name: 'Total',
                     value: sum
                 });
                 return result;
             },
             parseRollNotation: function(notation) {
-                var dropLowest = false
+                var dropLowest = false;
                 var result = parseInt(notation);
                 if (notation.indexOf('d') > -1) {
                     result = 0;
                     if (notation.indexOf('-L') > -1) {
                         dropLowest = true;
-                        notation = notation.replace(/-L/, "");
-                    };
+                        notation = notation.replace(/-L/, '');
+                    }
                     var numDice = parseInt(notation.split('d')[0]);
                     var diceFaces = parseInt(notation.split('d')[1]);
                     var lowest = dropLowest ? diceFaces : 0;
