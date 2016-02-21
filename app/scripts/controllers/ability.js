@@ -3,12 +3,25 @@
 angular.module('statRollerApp')
   .factory('RaceFactory', function($http, $q) {
     var factory = {};
+    var abilityNames = ["Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma", "Any"];
+
     factory.getRaceList = function() {
       var deferred = $q.defer();
       $http.get('data/races.json').success(function(data) {
         var array = [];
         for (var key in data) {
-          array.push(data[key]);
+            var race = data[key];
+            var verboseArray = [];
+            for (var element in race["Ability Modifiers"]) {
+                if (abilityNames.indexOf(element) > -1) {
+                    verboseArray.push(race["Ability Modifiers"][element] + ' ' + element.substr(0,3) );
+                }
+            }
+            race.verboseName = race.name;
+            if(verboseArray.length > 0) {
+                race.verboseName += ' (' + verboseArray.join('; ') + ')';
+            }
+            array.push(race);
         }
         deferred.resolve(array);
       });
@@ -55,6 +68,28 @@ angular.module('statRollerApp')
   return abilities;
 })
 
+.directive('abilityScore', function() {
+    return {
+        restrict: 'E',
+        template: '<label>{{ ability.name }}</label>'
+            +'<div class="calculation stat" id="{{ ability.name }}"><div>'
+            +'<input type="number" min="3" max="18" ng-model="character.abilities[ability.name].baseScore" ng-init="character.abilities[ability.name].baseScore=10">'
+            +'<label>Base Score</label></div><div ng-show="bonusAbilityPoints()">'
+            +'<div>+</div>'
+            +'<input type="number" min="0" max="{{ pointsLeft(ability) }}" ng-model="character.abilities[ability.name].bonusPoints" ng-init="character.abilities[ability.name].bonusPoints=0">'
+            +'<label>Bonus Points</label></div>'
+            +'<div ng-show="character.race">'
+            +'<div>+</div>'
+            +'<input type="text" disabled value="{{ getRacialModifier(ability.name) | signedNumber}}"><label>Racial Bonus</label></div><div ng-show="getAgeModifier(ability)">'
+            +'<div>+</div>'
+            +'<div><input type="text" disabled value="{{ getAgeModifier(ability) | signedNumber }}">'
+            +'<label>Age Modifier</label></div></div>'
+            +'<div><div>=</div>'
+            +'<input type="number" class="result" disabled value="{{ getAdjustedScore(ability) }}">'
+            +'<label>Adjusted Score</label></div><div><input type="text" class="result" disabled value="{{ getAbilityModifier(ability) | signedNumber }}"><label>Ability Modifier</label></div></div>',
+    };
+})
+
 .controller('AbilityCtrl', function($scope, AbilityFactory, RaceFactory, RollerFactory) {
     $scope.character = {
       experience: 0,
@@ -73,83 +108,7 @@ angular.module('statRollerApp')
       },
       skills: {},
       traits: {},
-      level: function(track) {
-        var advancement = {
-          'Slow': [0,
-            3000,
-            7500,
-            14000,
-            23000,
-            35000,
-            53000,
-            77000,
-            115000,
-            160000,
-            235000,
-            330000,
-            475000,
-            665000,
-            955000,
-            1350000,
-            1900000,
-            2700000,
-            3850000,
-            5350000
-          ],
-          'Medium': [0,
-            2000,
-            5000,
-            9000,
-            15000,
-            23000,
-            35000,
-            51000,
-            75000,
-            105000,
-            155000,
-            220000,
-            315000,
-            445000,
-            635000,
-            890000,
-            1300000,
-            1800000,
-            2550000,
-            3600000
-          ],
-          'Fast': [0,
-            1300,
-            3300,
-            6000,
-            10000,
-            15000,
-            23000,
-            34000,
-            50000,
-            71000,
-            105000,
-            145000,
-            210000,
-            295000,
-            425000,
-            600000,
-            850000,
-            1200000,
-            1700000,
-            2400000
-          ]
-        };
-
-        track = track ? track : 'Medium';
-
-        for (var i = advancement[track].length - 1; i > 0; i--) {
-          if ($scope.character.experience >= advancement[track][i]) {
-            return i + 1;
-          }
-        }
-        return 1;
-      },
-
+      level: 1,
       setRace: function(race) {
         $scope.racialBonus = '';
         for (var key in $scope.character.favoredBonuses) {
@@ -198,6 +157,7 @@ angular.module('statRollerApp')
     });
 
 
+
     $scope.abilityList = AbilityFactory;
 
     $scope.roll = function(notation) {
@@ -224,7 +184,7 @@ angular.module('statRollerApp')
     };
 
     $scope.bonusAbilityPoints = function() {
-      return Math.round($scope.character.level() / 4, 0);
+      return Math.round($scope.character.level / 4, 0);
     };
 
     $scope.bonusAbilityPointsSpent = function() {
