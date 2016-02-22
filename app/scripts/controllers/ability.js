@@ -3,25 +3,25 @@
 angular.module('statRollerApp')
   .factory('RaceFactory', function($http, $q) {
     var factory = {};
-    var abilityNames = ["Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma", "Any"];
+    var abilityNames = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma', 'Any'];
 
     factory.getRaceList = function() {
       var deferred = $q.defer();
       $http.get('data/races.json').success(function(data) {
         var array = [];
         for (var key in data) {
-            var race = data[key];
-            var verboseArray = [];
-            for (var element in race["Ability Modifiers"]) {
-                if (abilityNames.indexOf(element) > -1) {
-                    verboseArray.push(race["Ability Modifiers"][element] + ' ' + element.substr(0,3) );
-                }
+          var race = data[key];
+          var verboseArray = [];
+          for (var element in race['Ability Modifiers']) {
+            if (abilityNames.indexOf(element) > -1) {
+              verboseArray.push(race['Ability Modifiers'][element] + ' ' + element.substr(0, 3));
             }
-            race.verboseName = race.name;
-            if(verboseArray.length > 0) {
-                race.verboseName += ' (' + verboseArray.join('; ') + ')';
-            }
-            array.push(race);
+          }
+          race.verboseName = race.name;
+          if (verboseArray.length > 0) {
+            race.verboseName += ' (' + verboseArray.join('; ') + ')';
+          }
+          array.push(race);
         }
         deferred.resolve(array);
       });
@@ -69,25 +69,78 @@ angular.module('statRollerApp')
 })
 
 .directive('abilityScore', function() {
-    return {
-        restrict: 'E',
-        template: '<label>{{ ability.name }}</label>'
-            +'<div class="calculation stat" id="{{ ability.name }}"><div>'
-            +'<input type="number" min="3" max="18" ng-model="character.abilities[ability.name].baseScore" ng-init="character.abilities[ability.name].baseScore=10">'
-            +'<label>Base Score</label></div><div ng-show="bonusAbilityPoints()">'
-            +'<div>+</div>'
-            +'<input type="number" min="0" max="{{ pointsLeft(ability) }}" ng-model="character.abilities[ability.name].bonusPoints" ng-init="character.abilities[ability.name].bonusPoints=0">'
-            +'<label>Bonus Points</label></div>'
-            +'<div ng-show="character.race">'
-            +'<div>+</div>'
-            +'<input type="text" disabled value="{{ getRacialModifier(ability.name) | signedNumber}}"><label>Racial Bonus</label></div><div ng-show="getAgeModifier(ability)">'
-            +'<div>+</div>'
-            +'<div><input type="text" disabled value="{{ getAgeModifier(ability) | signedNumber }}">'
-            +'<label>Age Modifier</label></div></div>'
-            +'<div><div>=</div>'
-            +'<input type="number" class="result" disabled value="{{ getAdjustedScore(ability) }}">'
-            +'<label>Adjusted Score</label></div><div><input type="text" class="result" disabled value="{{ getAbilityModifier(ability) | signedNumber }}"><label>Ability Modifier</label></div></div>',
-    };
+  return {
+    restrict: 'E',
+    // scope: {stat: '@ability'},
+    templateUrl: '/views/ability-score.html',
+    // controller: function($scope) {
+    //
+    // }
+  };
+})
+
+.directive('score2', function(){
+  return {
+    restrict: 'E',
+    scope: {
+      value: '=',
+      label: '@',
+      prefix: '@'
+    },
+    transclude: true,
+    template: '<div ng-bind="this.prefix"></div><div><div class="score" ng-bind="this.value"></div><label ng-bind="this.label"></label></div>'
+  };
+})
+
+.directive('score', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      min: '=',
+      max: '=',
+      init: '@',
+      title: '@',
+      prefix: '@'
+    },
+    transclude: true,
+    require: 'ngModel',
+    template: '<div class="prefix"></div><div><div class="score"></div><label></label></div>',
+    link: function(scope, iElement, iAttrs, ngModelController) {
+      ngModelController.$render = function() {
+        if (scope.prefix) {
+          iElement.find('div.prefix').text(scope.prefix);
+        }
+        iElement.find('div.score').text(ngModelController.$viewValue);
+        iElement.find('label').text(scope.title);
+      };
+
+      function updateModel(offset) {
+        ngModelController.$setViewValue(ngModelController.$viewValue + offset);
+        ngModelController.$render();
+      }
+
+      ngModelController.$setViewValue(scope.init * 1 || 0);
+      ngModelController.$render();
+
+      iElement.bind('click', function(event) {
+        scope.$apply(function() {
+          event.preventDefault();
+          if (ngModelController.$viewValue < scope.max) {
+            updateModel(+1);
+          }
+        });
+      });
+
+      iElement.bind('contextmenu', function(event) {
+        scope.$apply(function() {
+          event.preventDefault();
+          if (ngModelController.$viewValue > scope.min) {
+            updateModel(-1);
+          }
+        });
+      });
+    }
+  };
 })
 
 .controller('AbilityCtrl', function($scope, AbilityFactory, RaceFactory, RollerFactory) {
@@ -157,8 +210,15 @@ angular.module('statRollerApp')
     });
 
 
-
     $scope.abilityList = AbilityFactory;
+
+    $scope.incrementBaseScore = function(ability) {
+      $scope.character.abilities[ability].baseScore += 1;
+    };
+
+    $scope.decrementBaseScore = function(ability) {
+      $scope.character.abilities[ability].baseScore -= 1;
+    };
 
     $scope.roll = function(notation) {
       for (var key in $scope.abilityList) {
@@ -184,7 +244,7 @@ angular.module('statRollerApp')
     };
 
     $scope.bonusAbilityPoints = function() {
-      return Math.round($scope.character.level / 4, 0);
+      return Math.floor($scope.character.level / 4, 0);
     };
 
     $scope.bonusAbilityPointsSpent = function() {

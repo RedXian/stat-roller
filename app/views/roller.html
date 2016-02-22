@@ -15,21 +15,19 @@
   <select ng-model="selectedRace" ng-change="character.setRace(selectedRace)" ng-options="race.verboseName for race in raceList"></select>
 </div>
 <div>
-  <label>Level <span>{{character.level}}</span><input type="range" ng-model="character.level" min="1" max="20"></label>
+  <label>Level <span>{{character.level}}</span><span ng-show="bonusAbilityPoints()"><b> Bonus Points:</b>{{ bonusAbilityPointsSpent() + "/" + bonusAbilityPoints() }}</span><input type="range" ng-model="character.level" min="1" max="20"></label>
 </div>
 
 <div ng-show="character.traits['Ability Modifiers'].Any">
+
   <select ng-model="racialBonus">
+
     <option value="" selected disabled hidden>Select Stat</option>
     <option value="{{ability.name}}" ng-repeat="ability in abilityList | orderObjectBy:'id'">{{ability.name}}</option>
   </select>
-</div>
-<div ng-show="bonusAbilityPoints()">
-  <p>
-    <strong>Bonus Points:
-    </strong>{{ bonusAbilityPointsSpent() + "/" + bonusAbilityPoints() }}</p>
+  <label>{{character.traits['Ability Modifiers'].Any | signedNumber}}</label>
 </div>
 
 <div ng-repeat="ability in abilityList | orderObjectBy:'id'">
-  <ability-score ability="{{ability}}"></ability-score>
+  <ability-score></ability-score>
 </div>
