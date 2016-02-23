@@ -1,24 +1,9 @@
 <label>{{ ability.name }}</label>
 <div class="calculation stat" id="{{ ability.name }}">
-  <score min="3" max="18" init="10" title="Base Score" ng-model="character.abilities[ability.name].baseScore"></score>
-  <score min="0" max="pointsLeft(ability)" init="0" title="Bonus Points" prefix="+" ng-model="character.abilities[ability.name].bonusPoints" ng-show="bonusAbilityPoints()"></score>
-  <div ng-show="character.race">
-    <div>+</div>
-    <input type="text" disabled value="{{getRacialModifier(ability.name) | signedNumber}}">
-    <label>Racial Bonus</label>
-  </div>
-  <div ng-show="getAgeModifier(ability)">
-    <div>+</div>
-    <div><input type="text" disabled value="{{getAgeModifier(ability) | signedNumber}}">
-      <label>Age Modifier</label>
-    </div>
-  </div>
-  <!-- <div>
-    <div>=</div> -->
-    <score2 prefix="=" label="Adjusted Score" value="getAdjustedScore(ability)"></score2>
-    <!-- <input type="number" class="result" disabled value="{{getAdjustedScore(ability)}}">
-    <label>Adjusted Score</label>
-  </div> -->
-  <score2 label="Ability Modifier"  value="getAbilityModifier(ability) | signedNumber"></score2>
-
+  <score-input min="3" max="18" init="10" title="Base Score" ng-model="character.abilities[ability.name].baseScore"></score-input>
+  <score-input min="0" max="pointsLeft(ability)" init="0" title="Bonus Points" prefix="+" ng-model="character.abilities[ability.name].bonusPoints" ng-show="bonusAbilityPoints()"></score-input>
+  <score-display prefix="+" label="Racial Bonus" value="getRacialModifier(ability.name)" ng-show="character.race"></score-display>
+  <score-display prefix="+" label="Age Modifier" value="getAgeModifier(ability)" ng-show="selectedAge!='Adulthood'"></score-display>
+  <score-display prefix="=" label="Adjusted Score" value="getAdjustedScore(ability)"></score-display>
+  <score-display label="Ability Modifier" value="getAbilityModifier(ability) | signedNumber"></score-display>
 </div>

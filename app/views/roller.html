@@ -12,22 +12,38 @@
 
 <div>
   <label>Race</label>
-  <select ng-model="selectedRace" ng-change="character.setRace(selectedRace)" ng-options="race.verboseName for race in raceList"></select>
+  <select ng-model="selectedRace" ng-change="character.setRace(selectedRace)" ng-options="race.verboseName for race in raceList">
+    <option ng-selected="true">Select Race</option>
+  </select>
 </div>
 <div>
-  <label>Level <span>{{character.level}}</span><span ng-show="bonusAbilityPoints()"><b> Bonus Points:</b>{{ bonusAbilityPointsSpent() + "/" + bonusAbilityPoints() }}</span><input type="range" ng-model="character.level" min="1" max="20"></label>
-</div>
+  <label>Age</label>
+  <select ng-model="selectedAge">
+    <option value="Young">Young</option>
+    <option ng-selected="true" value="Adulthood">Adulthood</option>
+    <option value="Middle Age">Middle Age</option>
+    <option value="Old">Old</option>
+    <option value="Venerable">Venerable</option>
+    </select>
+  </div>
+  <div>
+    <label>Level
+      <span>{{character.level}}</span>
+      <span ng-show="bonusAbilityPoints()">
+        <b>
+          Bonus Points:</b>{{ bonusAbilityPointsSpent() + "/" + bonusAbilityPoints() }}</span><input type="range" ng-model="character.level" min="1" max="20"></label>
+  </div>
 
-<div ng-show="character.traits['Ability Modifiers'].Any">
+  <div ng-show="character.traits['Ability Modifiers'].Any">
 
-  <select ng-model="racialBonus">
+    <select ng-model="racialBonus">
 
-    <option value="" selected disabled hidden>Select Stat</option>
-    <option value="{{ability.name}}" ng-repeat="ability in abilityList | orderObjectBy:'id'">{{ability.name}}</option>
-  </select>
-  <label>{{character.traits['Ability Modifiers'].Any | signedNumber}}</label>
-</div>
+      <option value="" selected disabled hidden>Select Stat</option>
+      <option value="{{ability.name}}" ng-repeat="ability in abilityList | orderObjectBy:'id'">{{ability.name}}</option>
+    </select>
+    <label>{{character.traits['Ability Modifiers'].Any | signedNumber}}</label>
+  </div>
 
-<div ng-repeat="ability in abilityList | orderObjectBy:'id'">
-  <ability-score></ability-score>
-</div>
+  <div ng-repeat="ability in abilityList | orderObjectBy:'id'">
+    <ability-score></ability-score>
+  </div>
