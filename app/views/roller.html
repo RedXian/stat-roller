@@ -5,9 +5,9 @@
     <option value="3d6">3d6</option>
     <option value="4d6-L">4d6 discard lowest</option>
     <option value="">Pointbuy</option>
-    <option value="">Manual Entry</option>
+    <option ng-selected="true" value="">Manual Entry</option>
   </select>
-  <button ng-click="roll(rollType)" class="fa fa-die-six"></div>
+  <button ng-click="roll(rollType)" class="fi-die-six"></div>
 </div>
 
 <div>
@@ -24,26 +24,35 @@
     <option value="Middle Age">Middle Age</option>
     <option value="Old">Old</option>
     <option value="Venerable">Venerable</option>
-    </select>
-  </div>
-  <div>
+  </select>
+</div>
+<div>
     <label>Level
       <span>{{character.level}}</span>
       <span ng-show="bonusAbilityPoints()">
         <b>
-          Bonus Points:</b>{{ bonusAbilityPointsSpent() + "/" + bonusAbilityPoints() }}</span><input type="range" ng-model="character.level" min="1" max="20"></label>
-  </div>
+          Bonus Points:</b>{{ bonusAbilityPointsSpent() + "/" + bonusAbilityPoints() }}</span>
+    </label>
+    <input type="range" ng-model="character.level" min="1" max="20" ng-change="checkPoints()" list="levelscale" step="1">
+    <datalist id="levelscale">
+      <option>4</option>
+      <option>8</option>
+      <option>12</option>
+      <option>16</option>
+      <option>20</option>
+    </datalist>
+</div>
 
-  <div ng-show="character.traits['Ability Modifiers'].Any">
+<div ng-show="character.traits['Ability Modifiers'].Any">
 
-    <select ng-model="racialBonus">
+  <select ng-model="racialBonus">
 
-      <option value="" selected disabled hidden>Select Stat</option>
-      <option value="{{ability.name}}" ng-repeat="ability in abilityList | orderObjectBy:'id'">{{ability.name}}</option>
-    </select>
-    <label>{{character.traits['Ability Modifiers'].Any | signedNumber}}</label>
-  </div>
+    <option value="" selected disabled hidden>Select Stat</option>
+    <option value="{{ability.name}}" ng-repeat="ability in abilityList | orderObjectBy:'id'">{{ability.name}}</option>
+  </select>
+  <label>{{character.traits['Ability Modifiers'].Any | signedNumber}}</label>
+</div>
 
-  <div ng-repeat="ability in abilityList | orderObjectBy:'id'">
-    <ability-score></ability-score>
-  </div>
+<div ng-repeat="ability in abilityList | orderObjectBy:'id'">
+  <ability-score></ability-score>
+</div>

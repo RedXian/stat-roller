@@ -89,14 +89,14 @@ angular.module('statRollerApp')
     },
     transclude: true,
     template: '<div class="prefix" ng-bind="showAdder()"></div><div><div class="score" ng-bind="showValue()"></div><label ng-bind="this.label"></label></div>',
-    link: function(scope, iElement, iAttrs) {
+    link: function(scope) {
       scope.showAdder = function() {
         if (this.prefix === '+') {
           return this.value < 0 ? '\u2212' : '\u002B';
         } else {
           return this.prefix;
         }
-      }
+      };
 
       scope.showValue = function() {
         if (this.prefix === '+') {
@@ -104,7 +104,7 @@ angular.module('statRollerApp')
         } else {
           return this.value;
         }
-      }
+      };
     }
   };
 })
@@ -161,6 +161,7 @@ angular.module('statRollerApp')
 })
 
 .controller('AbilityCtrl', function($scope, AbilityFactory, RaceFactory, RollerFactory) {
+    $scope.selectedAge = 'Adulthood';
     $scope.character = {
       experience: 0,
       abilities: {},
@@ -263,34 +264,34 @@ angular.module('statRollerApp')
     $scope.getAgeModifier = function(ability) {
       var modifier = 0;
       switch ($scope.selectedAge) {
-        case "Young":
+        case 'Young':
           switch (ability.name) {
-            case "Strength":
+            case 'Strength':
               modifier = -2;
               break;
-            case "Dexterity":
+            case 'Dexterity':
               modifier = +2;
               break;
-            case "Constitution":
+            case 'Constitution':
               modifier = -2;
               break;
-            case "Wisdom":
+            case 'Wisdom':
               modifier = -2;
           }
           break;
-        case "Adulthood":
+        case 'Adulthood':
           break;
-        case "Middle Age":
+        case 'Middle Age':
           modifier = 1;
           break;
-        case "Old":
+        case 'Old':
           modifier = 2;
           break;
-        case "Venerable":
+        case 'Venerable':
           modifier = 3;
           break;
       }
-      return (ability.type == "Physical" && $scope.selectedAge !== "Young") ? -modifier : modifier;
+      return (ability.type === 'Physical' && $scope.selectedAge !== 'Young') ? -modifier : modifier;
     };
 
     $scope.bonusAbilityPoints = function() {
@@ -305,6 +306,13 @@ angular.module('statRollerApp')
         }
       }
       return points;
+    };
+
+    $scope.checkPoints = function (){
+      var lowestLevel = $scope.bonusAbilityPointsSpent() * 4;
+      if ($scope.character.level < lowestLevel) {
+        $scope.character.level = lowestLevel;
+      }
     };
 
     $scope.pointsLeft = function(ability) {
