@@ -1,13 +1,16 @@
 <h2>Abilities</h2>
 <div>
   <label>Roll</label>
-  <select ng-model="rollType" ng-init="rollType='4d6-L'">
-    <option value="3d6">3d6</option>
-    <option value="4d6-L">4d6 discard lowest</option>
-    <option value="">Pointbuy</option>
-    <option ng-selected="true" value="">Manual Entry</option>
+  <select ng-model="selectedOption" ng-change="selectRollOption()">
+    <option value="1">Roll 3d6</option>
+    <option value="2">Roll 4d6 discard lowest</option>
+    <option value="3">Pointbuy: Low Fantasy</option>
+    <option value="4">Pointbuy: Standard Fantasy</option>
+    <option value="5">Pointbuy: High Fantasy</option>
+    <option value="6">Pointbuy: Epic Fantasy</option>
+    <option ng-selected="true" value="0">Manual Entry</option>
   </select>
-  <button ng-click="roll(rollType)" class="fi-die-six"></div>
+  <button ng-click="roll(rollType)" ng-show="selectedOption=='1' || selectedOption=='2'"></div>
 </div>
 
 <div>
@@ -16,6 +19,7 @@
     <option ng-selected="true">Select Race</option>
   </select>
 </div>
+
 <div>
   <label>Age</label>
   <select ng-model="selectedAge">
@@ -26,31 +30,36 @@
     <option value="Venerable">Venerable</option>
   </select>
 </div>
+
 <div>
-    <label>Level
-      <span>{{character.level}}</span>
-      <span ng-show="bonusAbilityPoints()">
-        <b>
-          Bonus Points:</b>{{ bonusAbilityPointsSpent() + "/" + bonusAbilityPoints() }}</span>
-    </label>
-    <input type="range" ng-model="character.level" min="1" max="20" ng-change="checkPoints()" list="levelscale" step="1">
-    <datalist id="levelscale">
-      <option>4</option>
-      <option>8</option>
-      <option>12</option>
-      <option>16</option>
-      <option>20</option>
-    </datalist>
+  <label>Level
+    <span>{{character.level}}</span>
+    <span ng-show="bonusAbilityPoints()">
+      <b>
+        Bonus Points:</b>{{ bonusAbilityPointsSpent() + "/" + bonusAbilityPoints() }}</span>
+  </label>
+  <input type="range" ng-model="character.level" min="1" max="20" ng-change="checkPoints()" list="levelscale" step="1">
+  <datalist id="levelscale">
+    <option>4</option>
+    <option>8</option>
+    <option>12</option>
+    <option>16</option>
+    <option>20</option>
+  </datalist>
 </div>
 
 <div ng-show="character.traits['Ability Modifiers'].Any">
-
   <select ng-model="racialBonus">
-
     <option value="" selected disabled hidden>Select Stat</option>
     <option value="{{ability.name}}" ng-repeat="ability in abilityList | orderObjectBy:'id'">{{ability.name}}</option>
   </select>
   <label>{{character.traits['Ability Modifiers'].Any | signedNumber}}</label>
+</div>
+
+<div>
+  <label ng-hide="selectedOption=='0' || selectedOption=='1' || selectedOption=='2'">Ability Points
+    <span> {{ pointbuyPointsSpent() + '/' + pointbuyPoints }} </span>
+  </label>
 </div>
 
 <div ng-repeat="ability in abilityList | orderObjectBy:'id'">

@@ -161,7 +161,56 @@ angular.module('statRollerApp')
 })
 
 .controller('AbilityCtrl', function($scope, AbilityFactory, RaceFactory, RollerFactory) {
+    $scope.selectedOption = '0';
     $scope.selectedAge = 'Adulthood';
+
+    $scope.selectRollOption = function() {
+      resetAbilityBaseScores();
+      switch ($scope.selectedOption) {
+        case '1':
+          $scope.rollType = '3d6';
+          break;
+        case '2':
+          $scope.rollType = '4d6-L';
+          break;
+        case '3':
+          $scope.pointbuyPoints = '10';
+          break;
+        case '4':
+          $scope.pointbuyPoints = '15';
+          break;
+        case '5':
+          $scope.pointbuyPoints = '20';
+          break;
+        case '6':
+          $scope.pointbuyPoints = '25';
+          break;
+      }
+    };
+
+    function resetAbilityBaseScores() {
+      for (var ability in $scope.character.abilities) {
+        $scope.character.abilities[ability].baseScore = 10;
+      }
+    }
+
+    $scope.pointbuyPointsSpent = function() {
+      var tally = 0;
+      for (var ability in $scope.character.abilities) {
+        tally += getPointBuyCost($scope.character.abilities[ability].baseScore);
+      }
+      return tally;
+    };
+
+    $scope.adjustMaximum = function(ability) {
+      var pointsAvailable = $scope.pointbuyPoints - $scope.pointbuyPointsSpent;
+      if (getPointBuyCost($scope.character.abilities[ability].baseScore * 1 + 1) >= pointsAvailable) {
+        return $scope.character.abilities[ability].baseScore + 1;
+      } else {
+        return $scope.character.abilities[ability].baseScore;
+      }
+    };
+
     $scope.character = {
       experience: 0,
       abilities: {},
@@ -227,16 +276,7 @@ angular.module('statRollerApp')
       }
     });
 
-
     $scope.abilityList = AbilityFactory;
-
-    $scope.incrementBaseScore = function(ability) {
-      $scope.character.abilities[ability].baseScore += 1;
-    };
-
-    $scope.decrementBaseScore = function(ability) {
-      $scope.character.abilities[ability].baseScore -= 1;
-    };
 
     $scope.roll = function(notation) {
       for (var key in $scope.abilityList) {
@@ -308,7 +348,7 @@ angular.module('statRollerApp')
       return points;
     };
 
-    $scope.checkPoints = function (){
+    $scope.checkPoints = function() {
       var lowestLevel = $scope.bonusAbilityPointsSpent() * 4;
       if ($scope.character.level < lowestLevel) {
         $scope.character.level = lowestLevel;
@@ -335,9 +375,9 @@ angular.module('statRollerApp')
       return $scope.character.abilities[ability.name].modifier;
     };
 
-    $scope.getPointBuyCost = function(score) {
+    function getPointBuyCost(score) {
       return [-4, -2, -1, 0, 1, 2, 3, 5, 7, 10, 13, 17][score - 7];
-    };
+    }
   })
   .filter('signedNumber', function() {
     return function(input) {
