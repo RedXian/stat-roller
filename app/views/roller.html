@@ -1,21 +1,7 @@
 <h2>Abilities</h2>
 <div>
-  <label>Roll</label>
-  <select ng-model="selectedOption" ng-change="selectRollOption()">
-    <option value="1">Roll 3d6</option>
-    <option value="2">Roll 4d6 discard lowest</option>
-    <option value="3">Pointbuy: Low Fantasy</option>
-    <option value="4">Pointbuy: Standard Fantasy</option>
-    <option value="5">Pointbuy: High Fantasy</option>
-    <option value="6">Pointbuy: Epic Fantasy</option>
-    <option ng-selected="true" value="0">Manual Entry</option>
-  </select>
-  <button ng-click="roll(rollType)" ng-show="selectedOption=='1' || selectedOption=='2'"></div>
-</div>
-
-<div>
   <label>Race</label>
-  <select ng-model="selectedRace" ng-change="character.setRace(selectedRace)" ng-options="race.verboseName for race in raceList">
+  <select ng-model="selectedRace" ng-change="character.setRace(selectedRace)" ng-options="(race | raceWithModifiers) for race in raceList">
     <option ng-selected="true">Select Race</option>
   </select>
 </div>
@@ -46,6 +32,20 @@
     <option>16</option>
     <option>20</option>
   </datalist>
+</div>
+
+<div>
+  <label>Roll</label>
+  <select ng-model="selectedOption" ng-change="selectRollOption()">
+    <option value="1">Roll 3d6</option>
+    <option value="2">Roll 4d6 discard lowest</option>
+    <option value="3">Pointbuy: Low Fantasy</option>
+    <option value="4">Pointbuy: Standard Fantasy</option>
+    <option value="5">Pointbuy: High Fantasy</option>
+    <option value="6">Pointbuy: Epic Fantasy</option>
+    <option ng-selected="true" value="0">Manual Entry</option>
+  </select>
+  <button ng-click="roll(rollType)" ng-show="selectedOption=='1' || selectedOption=='2'"></div>
 </div>
 
 <div ng-show="character.traits['Ability Modifiers'].Any">
